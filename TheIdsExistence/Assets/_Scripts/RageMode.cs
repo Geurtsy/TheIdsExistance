@@ -32,6 +32,9 @@ public class RageMode : MonoBehaviour {
                 Rage();
             else
                 _currentRage = value < 0 ? 0 : value;
+
+            if(_currentRage == 0)
+                Lose();
         }
     }
 
@@ -51,7 +54,6 @@ public class RageMode : MonoBehaviour {
     private IEnumerator Start()
     {
         _gg = GameObject.FindGameObjectWithTag("GameGod").GetComponent<GameGod>();
-        _currentRage = 0;
         _currentSpawns = 0;
         _ragePT.SetActive(false);
 
@@ -77,6 +79,11 @@ public class RageMode : MonoBehaviour {
     private void Rage()
     {
         _ragePT.SetActive(true);
+        _gg.EndMode(true);
+    }
+
+    private void Lose()
+    {
         _gg.EndMode(false);
     }
 
