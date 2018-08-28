@@ -5,18 +5,20 @@ using UnityEngine.SceneManagement;
 
 public class GameGod : MonoBehaviour
 {
-    public enum GameMode { RAGE, NONE }
+    public enum GameMode { RAGE, COMPASSION, GREED, NONE }
 
-    private GameMode _activeGamemode;
+    public GameMode _activeGamemode;
 
     [SerializeField] private Canvas _mainCanvasRef;
     public static Canvas _mainCanvas;
 
     [Header("Other")]
-    [SerializeField] private CameraAdjuster _camAdjuster;
+    public CameraAdjuster _camAdjuster;
 
     private EventController _eventCtrl;
     private bool _won;
+
+    private bool _isFirstSceneLoad = true;
 
     private void OnEnable()
     {
@@ -35,6 +37,12 @@ public class GameGod : MonoBehaviour
 
     private void SceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if(_isFirstSceneLoad)
+        {
+            _isFirstSceneLoad = false;
+            return;
+        }
+
         if(scene.buildIndex == 0)
         {
             _camAdjuster.gameObject.SetActive(true);
@@ -42,7 +50,7 @@ public class GameGod : MonoBehaviour
             if(_won)
             {
                 _camAdjuster.Adjust();
-                _eventCtrl.ActivateNextEvent();
+                StartCoroutine(_eventCtrl.ActivateNextEvent());
             }
             else
                 _eventCtrl.ReactivateEvent();
@@ -67,7 +75,7 @@ public class GameGod : MonoBehaviour
 
     public void ActivateMode(GameMode gameMode)
     {
-        print("Mode Active");
+        _activeGamemode = gameMode;
         _eventCtrl.DeactiveEvent(false);
 
         switch(gameMode)
@@ -75,6 +83,15 @@ public class GameGod : MonoBehaviour
             case GameMode.RAGE:
                 SceneManager.LoadScene("SCN_Mode_Rage");
                 break;
+
+            case GameMode.COMPASSION:
+                SceneManager.LoadScene("SCN_Mode_Compassion");
+                break;
+
+            case GameMode.GREED:
+                SceneManager.LoadScene("SCN_Mode_Greed");
+                break;
+
             default:
                 print("Setup mode first.");
                 return;
@@ -84,6 +101,10 @@ public class GameGod : MonoBehaviour
     public void EndMode(bool won)
     {
         _won = won;
+
+        if(!won)
+            _activeGamemode = GameMode.NONE;
+
         SceneManager.LoadScene(0);
     }
 

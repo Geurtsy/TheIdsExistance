@@ -8,6 +8,7 @@ public class CameraAdjuster : MonoBehaviour
 
     [Range(0, 1)]
     [SerializeField] private float _sizeReductionFactor;
+    [SerializeField] private float _minCamSize;
 
     public struct Range
     {
@@ -41,7 +42,11 @@ public class CameraAdjuster : MonoBehaviour
             }
 
             Rect rect = new Rect(_xRange.min, _yRange.min, (_xRange.max - _xRange.min), (_yRange.max - _yRange.min));
-            Camera.main.orthographicSize = rect.size.magnitude * _sizeReductionFactor;
+
+            float newSize = rect.size.magnitude * _sizeReductionFactor;
+            newSize = newSize < _minCamSize ? _minCamSize : newSize;
+
+            Camera.main.orthographicSize = newSize;
         }
     }
 }

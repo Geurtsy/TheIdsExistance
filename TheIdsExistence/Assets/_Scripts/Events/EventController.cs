@@ -1,16 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EventController : MonoBehaviour {
 
     [Header("Events")]
     [SerializeField] private Event[] _events;
     private int _nextEventIndex;
+    private Event _currentEvent;
 
     [Header("Door Positioning")]
     [SerializeField] private float _xSpacing;
     private List<GameObject> _currentDoors;
+
+    [Header("Story")]
+    [SerializeField] private GameObject _storyCanvas;
+    [SerializeField] private Image _stillImg;
+    [SerializeField] private Text _dialogueTxt;
 
     private GameGod _gg;
 
@@ -18,27 +25,76 @@ public class EventController : MonoBehaviour {
     {
         _currentDoors = new List<GameObject>();
         _gg = GetComponent<GameGod>();
-        ActivateNextEvent();
+        StartCoroutine(ActivateNextEvent());
     }
 
-    public void ActivateNextEvent()
+    public IEnumerator ActivateNextEvent()
     {
         if(_nextEventIndex >= _events.Length)
         {
             _gg.EndGame();
-            return;
+            yield return null;
         }
 
         DeactiveEvent(true);
 
-        _events[_nextEventIndex].BeginEvent(this);
-
+        _currentEvent = _events[_nextEventIndex];
         _nextEventIndex++;
+
+        StartCoroutine(DisplayCutScene(_currentEvent._stillImage, _currentEvent._dialogue));
+
+        while(_storyCanvas.activeSelf)
+            yield return null;
+
+        CreateNewDoors(_currentEvent._availableDoorPrefabs);
+    }
+
+    public IEnumerator DisplayCutScene(Sprite image, string[] dialogue)
+    {
+        _storyCanvas.SetActive(true);
+        _stillImg.sprite = image;
+
+        for(int index = 0; index < _currentEvent._response.Length; index++)
+        {
+            bool isRead = false;
+            _dialogueTxt.text = _currentEvent._response[FindResponseIndex()];
+
+            while(!isRead)
+            {
+                if(Input.GetKeyDown(KeyCode.Return))
+                    isRead = true;
+
+                yield return null;
+            }
+
+            yield return null;
+
+
+        }
+        
+        for(int index = 0; index < dialogue.Length; index++)
+        {
+            bool isRead = false;
+            _dialogueTxt.text = dialogue[index];
+
+            while(!isRead)
+            {
+                if(Input.GetKeyDown(KeyCode.Return))
+                    isRead = true;
+
+                yield return null;
+            }
+
+            yield return null;
+        }
+
+        _storyCanvas.SetActive(false);
+        yield return null;
     }
 
     public void ReactivateEvent()
     {
-        _events[_nextEventIndex - 1]._eventIsActive = true;
+        _currentEvent._eventIsActive = true;
         EnableCurrentDoors();
     }
 
@@ -79,6 +135,8 @@ public class EventController : MonoBehaviour {
 
             _currentDoors[index].transform.position = currentPos;
         }
+
+        _gg._camAdjuster.Adjust();
     }
 
     public void EnableCurrentDoors()
@@ -90,5 +148,22 @@ public class EventController : MonoBehaviour {
             if(enable)
                 go.SetActive(true);
         }
+    }
+
+    private int FindResponseIndex()
+    {
+        switch(_gg._activeGamemode)
+        {
+            case GameGod.GameMode.RAGE:
+                return 0;
+
+            case GameGod.GameMode.COMPASSION:
+                return 1;
+
+            case GameGod.GameMode.GREED:
+                return 2;
+        }
+
+        return 0;
     }
 }

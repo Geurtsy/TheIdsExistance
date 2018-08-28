@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class Door : MonoBehaviour {
 
     [SerializeField] private string _sceneName;
+    [SerializeField] private GameGod.GameMode _gameMode;
     private GameGod _gg;
     [HideInInspector] public bool _activated;
 
@@ -23,6 +24,6 @@ public class Door : MonoBehaviour {
     {
         print("Shit.");
         _activated = true;
-        _gg.ActivateMode(GameGod.GameMode.RAGE);
+        _gg.ActivateMode(_gameMode);
     }
 }

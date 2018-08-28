@@ -11,4 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SCN_Mode_Rage.unity
     guid: 0e556c5e371f42e4c8871fd1aba223b3
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/Scenes/SCN_Mode_Compassion.unity
+    guid: 8f874f330527edd409ad69e506a5d861
+  - enabled: 1
+    path: Assets/Scenes/SCN_Mode_Greed.unity
+    guid: 513ace461c61c2046b09c3c987891718

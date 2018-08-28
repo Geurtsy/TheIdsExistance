@@ -7,25 +7,15 @@ using UnityEngine.UI;
 public class Event {
 
     [Header("Doors")]
-    [SerializeField] private GameObject[] _availableDoorPrefabs;
+    public GameObject[] _availableDoorPrefabs;
 
     [Header("Scene")]
-    [SerializeField] private Image _stillImage;
-    [SerializeField] private string[] _dialogue;
+    public Sprite _stillImage;
+    [TextArea]
+    public string[] _dialogue;
+    [TextArea]
+    public string[] _response;
 
     [HideInInspector] public bool _eventIsActive;
     [HideInInspector] public EventController _myEventController;
-
-    // Use this for initialization
-    public void BeginEvent(EventController eventController)
-    {
-        _myEventController = eventController;
-        _myEventController.CreateNewDoors(_availableDoorPrefabs);
-        _eventIsActive = true;
-    }
-
-    public void ExitEvent()
-    {
-        _eventIsActive = false;
-    }
 }
